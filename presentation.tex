@@ -1,0 +1,526 @@
+\documentclass[10pt]{beamer}
+\usepackage[utf8]{inputenc}
+
+\usetheme{metropolis}
+
+\usepackage{acronym} % \ac[p], \acl[p], \acs[p], \acf[p]
+\usepackage{appendixnumberbeamer}
+\usepackage[scale=2]{ccicons}
+\usepackage{subcaption} % subfigure
+\usepackage[absolute, overlay]{textpos}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{transparent}
+\usepackage{verbatim}
+
+% Acronyms
+% --------
+\acrodef{CRDT}[CRDT]{Conflict-free Replicated Data Type}
+\acrodefplural{CRDT}[CRDTs]{Conflict-free Replicated Data Types}
+
+\author{
+  Matthieu Nicolas (\url{matthieu.nicolas@inria.fr})
+  \\
+  COAST team
+  \\
+  \textbf{Supervised by} Gérald Oster and Olivier Perrin
+}
+\title{Efficient renaming in \acp{CRDT}}
+\subtitle{Case Study of a Sequence CRDT : LogootSplit}
+\institute{
+  \vspace{3em}
+  \includegraphics[width=2.8cm]{img/loria-logo.png}\hspace{3em}
+  \includegraphics[width=1.2cm]{img/ul-logo.pdf}\hspace{3em}
+  \includegraphics[width=3cm]{img/inria-logo.pdf}\hspace{3em}
+  \includegraphics[width=1.2cm]{img/cnrs-logo.png}
+}
+
+\usepackage[backend=biber,defernumbers=true,style=trad-plain,sorting=ydnt,maxbibnames=1,maxcitenames=1]{biblatex}
+\addbibresource{biblio.bib}
+\AtBeginBibliography{\footnotesize}
+\setbeamertemplate{bibliography item}[text] % use ref number in bibliography
+
+\renewcommand{\thefootnote}{[\arabic{footnote}]}
+
+\usepackage{silence}
+\WarningFilter{biblatex}{Patching footnotes failed}
+
+\begin{document}
+
+\begin{frame}[t,plain]
+  \maketitle
+\end{frame}
+
+\begin{frame}{\acfp{CRDT} \footfullcite{shapiro_2011_crdt}}
+  \begin{columns}
+    \begin{column}{0.65\textwidth}
+      \begin{tikzpicture}
+
+        \node (origin) {};
+        \path (origin)
+          to ++(90:2) node[label=below:{\textbf{A}},
+            label=above:{
+              \includegraphics<1>[scale=0.5]{img/doc.pdf}
+              \includegraphics<2-4>[scale=0.5]{img/docA.pdf}
+              \includegraphics<5->[scale=0.5]{img/docABC.pdf}}
+          ] (A) {\includegraphics{img/blue-node.pdf}};
+
+        \path (origin)
+          to ++(225:2) node[label=below:{\textbf{B}},
+            label=left:{
+              \includegraphics<1-2>[scale=0.5]{img/doc.pdf}
+              \includegraphics<3>[scale=0.5]{img/docA.pdf}
+              \includegraphics<4>[scale=0.5]{img/docAB.pdf}
+              \includegraphics<5>[scale=0.5]{img/docABC.pdf}
+            }] (B) {\includegraphics{img/red-node.pdf}};
+
+        \path (origin)
+          to ++(-45:2) node[label=below:{C},
+            label=right:{
+              {\transparent{0.4}\includegraphics<1-3>[scale=0.5]{img/doc.pdf}}
+              \includegraphics<4>[scale=0.5]{img/docC.pdf}
+              \includegraphics<5->[scale=0.5]{img/docABC.pdf}
+            }] (C) {
+              {\transparent{0.4}\includegraphics<1-3>{img/green-node.pdf}}
+              \includegraphics<4->{img/green-node.pdf}
+              };
+
+        \draw (A) -- (B) -- (C) -- (A);
+
+        \node<2>[below left=-30pt and 5pt of A] {\includegraphics[scale=0.4]{img/blue-update.pdf}};
+        \node<2, 4>[below right=-30pt and 5pt of A] {\includegraphics[scale=0.4]{img/blue-update.pdf}};
+
+        \node<4>[below right=-4pt and 1pt of B] {\includegraphics[scale=0.5]{img/red-update.pdf}};
+        \node<4>[above left=1pt and -15pt of B] {\includegraphics[scale=0.5]{img/red-update.pdf}};
+
+        \node<4>[below left=-4pt and 1pt of C] {\includegraphics[scale=0.5]{img/green-update.pdf}};
+        \node<4>[above right=1pt and -15pt of C] {\includegraphics[scale=0.5]{img/green-update.pdf}};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.35\textwidth}
+      \begin{itemize}
+        \item Replicated data structure
+        \item<2-> Updates performed without coordination
+        \item<5-> Strong Eventual Consistency
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Identifier-based \acp{CRDT}}
+  \begin{block}{Main idea}
+    \begin{itemize}
+      \item Attach an identifier to each element
+    \end{itemize}
+  \end{block}
+
+  \bigskip
+
+  \begin{block}{Allow to design commutative updates}
+    \begin{itemize}
+      \item Identifying uniquely elements
+      \item Ordering concurrent updates
+      \item ...
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Research issue}
+  \begin{alertblock}{Limits}
+    \begin{itemize}
+      \item Unbounded size of identifiers
+      \item Overhead of the data structure increasing over time
+    \end{itemize}
+  \end{alertblock}
+
+  \pause
+
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth]{img/overhead-size.pdf}
+    \caption{Footprint of the data structure}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[standout]
+  \alert{How to reduce the overhead introduced by the data structure ?}
+
+  \bigskip
+  \pause
+
+  Reassign shorter identifiers in a fully distributed manner
+\end{frame}
+
+\begin{frame}{LogootSplit \footfullcite{AndreCollaborateCom2013}}
+  \begin{itemize}
+    \item State of the art of \emph{Sequence \acp{CRDT}}
+    \item Elements are ordered by their identifier, noted here as lowercase letters
+  \end{itemize}
+
+  \pause
+
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.15]{img/helo-as-letters.png}
+        \caption{State of a sequence which contains the elements "helo" and their corresponding identifiers}
+      \end{figure}
+    \end{column}
+    \pause
+    \begin{column}{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[scale=0.15]{img/helo-as-block.png}
+        \caption{State of a sequence which contains the block "helo"}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Example}
+  \begin{figure}
+    \includegraphics[scale=0.09]{img/initial-state.png}<1-1>
+    \includegraphics[scale=0.09]{img/insert-world.png}<2-2>
+    \includegraphics[scale=0.09]{img/insert-split.png}<3-3>
+    \includegraphics[scale=0.09]{img/insert-l.png}<4-4>
+    \includegraphics[scale=0.09]{img/final-state.png}<5-5>
+    \caption{Example of concurrent $insert$ operations}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Declining performances}
+  \begin{itemize}
+    \item Updates performed may lead to an inefficient internal representation
+  \end{itemize}
+  \begin{figure}
+    \includegraphics[scale=0.15]{img/worst-case.png}
+    \caption{Example of inefficient internal representation}
+  \end{figure}
+  \begin{itemize}
+    \item The more blocks we have:
+    \begin{itemize}
+      \item The more metadata we store
+      \item The longer it takes to browse the sequence to $insert$ or $remove$ an element
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[standout]
+  Our approach
+\end{frame}
+
+\begin{frame}{RenamableLogootSplit}
+  \begin{itemize}
+    \item Propose \emph{RenamableLogootSplit}, \emph{LogootSplit} with a $rename$ operation
+    \item Can be perform without coordination
+    \item Today, focus on scenario without concurrent \emph{rename} operations
+  \end{itemize}
+  \begin{figure}
+    \includegraphics[scale=0.11]{img/renaming-1.png}<1-1>
+    \includegraphics[scale=0.11]{img/renaming-2.png}<2-2>
+    \includegraphics[scale=0.11]{img/renaming-3.png}<3-3>
+    \includegraphics[scale=0.11]{img/renaming-4.png}<4-4>
+    \includegraphics[scale=0.11]{img/renaming-5.png}<5->
+    \caption{Example of renaming}
+  \end{figure}
+  \begin{itemize}
+    \item<2-> Generates a new identifier for the first element, based on its previous identifier
+    \item<3-> Then generates contiguous identifiers for all following elements
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Handling concurrent operations}
+  \begin{itemize}
+    \item Others may perform updates concurrently to a \emph{rename} operation
+    \item<4-> May lead to inconsistencies
+  \end{itemize}
+  \begin{figure}
+    \includegraphics[scale=0.08]{img/concurrent-insert-rename-1.png}<1-1>
+    \includegraphics[scale=0.08]{img/concurrent-insert-rename-2.png}<2-2>
+    \includegraphics[scale=0.08]{img/concurrent-insert-rename-3.png}<3-3>
+    \includegraphics[scale=0.08]{img/concurrent-insert-rename-4.png}<4-4>
+    \includegraphics[scale=0.08]{img/concurrent-insert-rename-5.png}<5-6>
+    \includegraphics[scale=0.08]{img/concurrent-insert-rename-6.png}<7->
+    \caption{Example of concurrent insert}
+  \end{figure}
+  \begin{itemize}
+    \item<5-> Use \emph{epoch-based} system to track concurrent operations
+    \item<6-> Define rewriting rules to transform identifiers from one \emph{epoch} to another
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Downsides}
+  \begin{block}{Need to store former state until no more concurrent operations}
+
+    \pause
+
+    \begin{itemize}
+      \item Can garbage collect it once the \emph{rename} operation is causally stable \footfullcite{10.1007/978-3-662-43352-2_11}
+      \item Can offload it to the disk meanwhile
+    \end{itemize}
+  \end{block}
+
+  \pause
+
+  \begin{block}{Need to propagate former state to other nodes}
+
+    \pause
+
+    \begin{itemize}
+      \item Can compress the operation to minimize bandwidth consumption
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+% \begin{frame}[standout]
+%   What about concurrent \emph{rename} operations ?
+% \end{frame}
+
+\begin{frame}[standout]
+  Evaluation
+\end{frame}
+
+
+\begin{frame}{Scenario}
+  \begin{itemize}
+    \item \textbf{Assumption:} Only one node can issue \emph{rename} operations
+  \end{itemize}
+
+  \begin{block}{Ran simulations to evaluate proposed approach:}
+    \begin{itemize}
+      \item 10 nodes share and edit a document collaboratively
+      \item Nodes use either LogootSplit or RenamableLogootSplit according to session
+      \pause
+      \item \textbf{Phase 1 (content generation):} 80/20\% of \emph{insert}/\emph{remove}
+      \item \textbf{Phase 2 (refactoring):} 50/50\% of \emph{insert}/\emph{remove}
+      \item Nodes switch to phase 2 when document reaches critical size (15 pages - 60k elements)
+      \pause
+      \item Overall, nodes perform 150k operations on the document
+      \item In the case of \emph{RenamableLogootSplit}, trigger a \emph{rename} operation every 30k operations
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Experimental settings}
+  \begin{itemize}
+    \item Use Node.js version 13.1.0
+    \item Obtained documents sizes using our fork of \emph{object-sizeof} \footnote{\url{https://www.npmjs.com/package/object-sizeof}}
+    \item Ran benchmarks on a workstation equipped of a Intel Xeon CPU E5-1620 (10MB Cache, 3.50 GHz) with 16GB of RAM running Fedora 31
+    \item Measured times using \texttt{process.hrtime.bigint()}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Results - Overhead of the data structure}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/snapshots-sizes.pdf}
+    \caption{Evolution of the size of the document}
+    \label{fig:evolution-document-size}
+  \end{figure}
+
+  \vspace{-1\baselineskip}
+  \begin{itemize}
+    \pause
+    \item \emph{Rename} resets the overhead of the CRDT, if can garbage collect
+    \pause
+    \item \emph{Rename} still reduces by $66\%$ the size otherwise
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Results - Integration time of \emph{insert} operations}
+  \begin{figure}
+    \captionsetup[subfigure]{aboveskip=-1pt,belowskip=-1pt}
+    \centering
+    \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\textwidth]{img/integration-time-boxplot-local-operations-without-outliers.pdf}
+        \caption{Local operations}
+        \label{fig:evolution-integration-time-local-insert-remove}
+    \end{subfigure}
+    \begin{subfigure}{0.47\textwidth}
+        \includegraphics[width=1\textwidth]{img/integration-time-boxplot-remote-operations-without-outliers.pdf}
+        \caption{Remote operations}
+        \label{fig:evolution-integration-time-remote-insert-remove}
+    \end{subfigure}
+    \caption{Evolution of the integration time of \emph{insert} operations}
+    \label{fig:evolution-integration-time-insert-remove}
+  \end{figure}
+
+  \vspace{-1\baselineskip}
+  \begin{itemize}
+    \pause
+    \item \emph{Rename} resets integration times of future operations
+    \pause
+    \item Transforming concurrent operations is actually faster than applying them on former state
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Results - Integration time of \emph{rename} operations}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/integration-time-rename-0.pdf}
+    \caption{Evolution of the integration time of \emph{rename} operations}
+    \label{fig:evolution-integration-time-rename}
+  \end{figure}
+
+  \vspace{-1\baselineskip}
+  \begin{itemize}
+    \pause
+    \item Noticeable by users if delayed too much
+    \pause
+    \item When to trigger \emph{rename} operations?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{To wrap up}
+
+  \begin{block}{Done}
+    \begin{itemize}
+      \item Designed a \emph{rename} operation for LogootSplit
+      \item Defined rewriting rules to deal with concurrent updates
+    \end{itemize}
+  \end{block}
+
+  \pause
+
+  \begin{block}{Work in progress}
+    \begin{itemize}
+      \item Implementing in MUTE \footfullcite{nicolas:hal-01655438}, our P2P collaborative text editor
+      \item Benchmarking its performances
+      \item Designing the strategy to trigger \emph{rename} operations
+    \end{itemize}
+  \end{block}
+
+  \pause
+
+  \begin{block}{To do}
+    \begin{itemize}
+      \item Publish it
+      \item Prove formally the correctness of the mechanism
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[standout]
+  Thanks for your attention, any questions?
+  \vspace{3em}
+  \begin{center}
+    \ccby
+  \end{center}
+\end{frame}
+
+\begin{frame}{Perspectives}
+
+  \begin{block}{Propose a strategy to avoid conflicting \emph{rename} operations}
+    \begin{itemize}
+      \item How to minimize likelihood of concurrent \emph{rename} operations without coordinating?
+    \end{itemize}
+  \end{block}
+
+  \pause
+
+  \begin{block}{Propose a smarter strategy to choose the "winning" renaming}
+    \begin{itemize}
+      \item How to minimize the overall computations?
+    \end{itemize}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}{LogootSplit identifiers}
+  \begin{itemize}
+    \item To comply with these constraints, LogootSplit proposes identifiers composed of quadruplets of integers of the following form:
+  \end{itemize}
+  \begin{center}
+    $<priority, siteId, seq, offset>$
+  \end{center}
+  \begin{itemize}
+    \item \emph{priority} allows to determine the position of this identifier compared to others
+    \item \emph{siteId} refers to the node's identifier, assumed to be unique
+    \item \emph{seq} refers to the node's logical clock, which increases monotonically with local operations
+    \item \emph{offset} refers to the element position in its original block
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Identifier constraints}
+
+  \begin{itemize}
+    \item To fulfill their role, identifiers have to comply to several constraints:
+  \end{itemize}
+
+  \begin{block}{Globally unique}
+    \begin{itemize}
+      \item Identifiers should never be generated twice, neither by different users nor by the same one at different times
+    \end{itemize}
+  \end{block}
+  \begin{block}{Totally ordered}
+    \begin{itemize}
+      \item We should always be able to compare and order two elements using their identifiers
+    \end{itemize}
+  \end{block}
+  \begin{block}{Dense set}
+    \begin{itemize}
+      \item We should always be able to add a new element, and thus a new identifier, between two others
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Handling concurrent \emph{rename}}
+
+  \begin{center}
+    \emph{The topic of a later contribution}
+  \end{center}
+
+  \pause
+
+  \begin{block}{\alert{\emph{rename} operation not commutative}}
+  \end{block}
+
+  \pause
+
+  \begin{block}{To fix this:}
+    \begin{itemize}
+      \item Define a total order between \emph{rename} operations
+      \item Pick a "winner" operation between concurrent \emph{renames}
+      \item Define additional rewriting rules to \emph{undo} the effect of "losing" ones
+    \end{itemize}
+  \end{block}
+
+\end{frame}
+
+% \begin{frame}{Identifier-based \acp{CRDT}}
+%   \begin{block}{Identifiers}
+%     \begin{itemize}
+%       \item Attached to elements or updates
+%       \item Have to comply to several constraints
+%       \begin{itemize}
+%         \item Unique
+%         \item Immutable
+%         \item Order relation
+%         \item Many others
+%       \end{itemize}
+%       \item Achieve transaction-less and commutative updates
+%     \end{itemize}
+%   \end{block}
+%   \begin{alertblock}{Limits}<2->
+%     \begin{itemize}
+%       \item Unbounded size of identifiers
+%       % TODO: Soit ils grossissent très vite, soit tombstones
+%       \item Efficiency decreasing over time
+%     \end{itemize}
+%   \end{alertblock}
+% \end{frame}
+
+% \begin{frame}{Research problem}
+%   \begin{block}{Reduce size of identifiers}
+%     \begin{itemize}
+%       \item Renaming problem\cite{AlistarhAGG2011}
+%     \end{itemize}
+%   \end{block}
+%   \begin{alertblock}<2->{Make identifiers mutable again}
+%     \begin{itemize}
+%       \item Trade-off mutability/immutability
+%     \end{itemize}
+%   \end{alertblock}
+% \end{frame}
+
+\end{document}

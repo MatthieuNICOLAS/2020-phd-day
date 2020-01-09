@@ -1,0 +1,16 @@
+\defcounter {refsection}{0}\relax 
+\beamer@slide {acro:CRDT}{1}
+\defcounter {refsection}{0}\relax 
+\beamer@slide {fig:evolution-document-size}{43}
+\defcounter {refsection}{0}\relax 
+\beamer@slide {fig:evolution-integration-time-local-insert-remove}{46}
+\defcounter {refsection}{0}\relax 
+\beamer@slide {sub@fig:evolution-integration-time-local-insert-remove}{46}
+\defcounter {refsection}{0}\relax 
+\beamer@slide {fig:evolution-integration-time-remote-insert-remove}{46}
+\defcounter {refsection}{0}\relax 
+\beamer@slide {sub@fig:evolution-integration-time-remote-insert-remove}{46}
+\defcounter {refsection}{0}\relax 
+\beamer@slide {fig:evolution-integration-time-insert-remove}{46}
+\defcounter {refsection}{0}\relax 
+\beamer@slide {fig:evolution-integration-time-rename}{49}

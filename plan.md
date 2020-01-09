@@ -1,0 +1,7 @@
+- CRDT
+- Overhead en mémoire
+- LogootSplit
+- Rename sans concurrence
+- Evaluation
+- Rename en concurrence?
+- Quand renommer?

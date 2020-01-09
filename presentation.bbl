@@ -1,0 +1,187 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.8 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \sortlist[entry]{ydnt/global/}
+    \entry{nicolas:hal-01655438}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=7528a569f2e4269a5c4b967606a5ca58}{%
+           family={Nicolas},
+           familyi={N\bibinitperiod},
+           given={Matthieu},
+           giveni={M\bibinitperiod}}}%
+        {{hash=1c9387009dbecbaf8e0002455823553a}{%
+           family={Elvinger},
+           familyi={E\bibinitperiod},
+           given={VIctorien},
+           giveni={V\bibinitperiod}}}%
+        {{hash=a27a6dfc7b10f9c65bfa3ccab2eaee92}{%
+           family={Oster},
+           familyi={O\bibinitperiod},
+           given={Gérald},
+           giveni={G\bibinitperiod}}}%
+        {{hash=23bc293728b3609ddaa444dcc92d6011}{%
+           family={Ignat},
+           familyi={I\bibinitperiod},
+           given={Claudia-Lavinia},
+           giveni={C\bibinithyphendelim L\bibinitperiod}}}%
+        {{hash=372cc94f33da7750cdff6ecec5549fa4}{%
+           family={Charoy},
+           familyi={C\bibinitperiod},
+           given={François},
+           giveni={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{6ed719cd063706a474456821d7335a55}
+      \strng{fullhash}{8c684a612ada0756b7c6e0b4b9406992}
+      \strng{authornamehash}{6ed719cd063706a474456821d7335a55}
+      \strng{authorfullhash}{8c684a612ada0756b7c6e0b4b9406992}
+      \field{sortinit}{2}
+      \field{sortinithash}{0aa614ace9f3a40ef5a67e7f7a184048}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{series}{Proceedings of European Conference on Computer-Supported Cooperative Work - Panels, Posters and Demos}
+      \field{title}{{MUTE: A Peer-to-Peer Web-based Real-time Collaborative Editor}}
+      \field{year}{2017}
+    \endentry
+    \entry{10.1007/978-3-662-43352-2_11}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=0bb140bbbc1d3ac7ec6a28bd9d506581}{%
+           family={Baquero},
+           familyi={B\bibinitperiod},
+           given={Carlos},
+           giveni={C\bibinitperiod}}}%
+        {{hash=846866cfed98e89c3995144153143928}{%
+           family={Almeida},
+           familyi={A\bibinitperiod},
+           given={Paulo\bibnamedelima Sérgio},
+           giveni={P\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=d56e9a2894470766285711ea1032a1bb}{%
+           family={Shoker},
+           familyi={S\bibinitperiod},
+           given={Ali},
+           giveni={A\bibinitperiod}}}%
+      }
+      \name{editor}{2}{}{%
+        {{hash=5efe29633726c2caf4d93758e617cc7c}{%
+           family={Magoutis},
+           familyi={M\bibinitperiod},
+           given={Kostas},
+           giveni={K\bibinitperiod}}}%
+        {{hash=21c929c62df652f90f442dc629746da2}{%
+           family={Pietzuch},
+           familyi={P\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Berlin, Heidelberg}%
+      }
+      \list{publisher}{1}{%
+        {Springer Berlin Heidelberg}%
+      }
+      \strng{namehash}{27323540735b1724fe670632a736ece0}
+      \strng{fullhash}{98274f266724dbc40b74fc3afd12cf15}
+      \strng{authornamehash}{27323540735b1724fe670632a736ece0}
+      \strng{authorfullhash}{98274f266724dbc40b74fc3afd12cf15}
+      \strng{editornamehash}{4219babfb5889adf43fae84e2aba4343}
+      \strng{editorfullhash}{67326a95ccdbbdf42c2d7b4dcad93694}
+      \field{sortinit}{2}
+      \field{sortinithash}{0aa614ace9f3a40ef5a67e7f7a184048}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Distributed Applications and Interoperable Systems}
+      \field{title}{Making Operation-Based CRDTs Operation-Based}
+      \field{year}{2014}
+      \field{pages}{126\bibrangedash 140}
+      \range{pages}{15}
+    \endentry
+    \entry{AndreCollaborateCom2013}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=7d46d06aed7c392c363a81b08953bce8}{%
+           family={André},
+           familyi={A\bibinitperiod},
+           given={Luc},
+           giveni={L\bibinitperiod}}}%
+        {{hash=ab2ab938a781736e227734e8f1e62991}{%
+           family={Martin},
+           familyi={M\bibinitperiod},
+           given={Stéphane},
+           giveni={S\bibinitperiod}}}%
+        {{hash=a27a6dfc7b10f9c65bfa3ccab2eaee92}{%
+           family={Oster},
+           familyi={O\bibinitperiod},
+           given={Gérald},
+           giveni={G\bibinitperiod}}}%
+        {{hash=23bc293728b3609ddaa444dcc92d6011}{%
+           family={Ignat},
+           familyi={I\bibinitperiod},
+           given={Claudia-Lavinia},
+           giveni={C\bibinithyphendelim L\bibinitperiod}}}%
+      }
+      \strng{namehash}{9db04de7f5d7cd0c8438933ee4365f07}
+      \strng{fullhash}{b8abd87660da6c46b2f09f0992a36cfe}
+      \strng{authornamehash}{9db04de7f5d7cd0c8438933ee4365f07}
+      \strng{authorfullhash}{b8abd87660da6c46b2f09f0992a36cfe}
+      \field{sortinit}{2}
+      \field{sortinithash}{0aa614ace9f3a40ef5a67e7f7a184048}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{International Conference on Collaborative Computing: Networking, Applications and Worksharing - CollaborateCom 2013}
+      \field{title}{Supporting Adaptable Granularity of Changes for Massive-Scale Collaborative Editing}
+      \field{year}{2013}
+    \endentry
+    \entry{shapiro_2011_crdt}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=f13a03ea8c9e34968f9bc55bb4e93d9f}{%
+           family={Shapiro},
+           familyi={S\bibinitperiod},
+           given={Marc},
+           giveni={M\bibinitperiod}}}%
+        {{hash=fa39b0ba7ddf7153cbf5e4b1d3641821}{%
+           family={Preguiça},
+           familyi={P\bibinitperiod},
+           given={Nuno\bibnamedelima M.},
+           giveni={N\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=0bb140bbbc1d3ac7ec6a28bd9d506581}{%
+           family={Baquero},
+           familyi={B\bibinitperiod},
+           given={Carlos},
+           giveni={C\bibinitperiod}}}%
+        {{hash=d091ed4cb7e2ab01f03d04bfcd52f83f}{%
+           family={Zawirski},
+           familyi={Z\bibinitperiod},
+           given={Marek},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{7936fce3a0285cdf6cd75bdb1ee0e5aa}
+      \strng{fullhash}{8f346f2cf51fbdeeaed4a9811b44e093}
+      \strng{authornamehash}{7936fce3a0285cdf6cd75bdb1ee0e5aa}
+      \strng{authorfullhash}{8f346f2cf51fbdeeaed4a9811b44e093}
+      \field{sortinit}{2}
+      \field{sortinithash}{0aa614ace9f3a40ef5a67e7f7a184048}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{International Symposium on Stabilization, Safety, and Security of Distributed Systems}
+      \field{title}{Conflict-Free Replicated Data Types}
+      \field{year}{2011}
+    \endentry
+  \endsortlist
+\endrefsection
+\endinput
+
