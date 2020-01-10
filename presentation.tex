@@ -372,7 +372,6 @@
 \end{frame}
 
 \begin{frame}{To wrap up}
-
   \begin{block}{Done}
     \begin{itemize}
       \item Designed a \emph{rename} operation for LogootSplit
@@ -408,24 +407,6 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{Perspectives}
-
-  \begin{block}{Propose a strategy to avoid conflicting \emph{rename} operations}
-    \begin{itemize}
-      \item How to minimize likelihood of concurrent \emph{rename} operations without coordinating?
-    \end{itemize}
-  \end{block}
-
-  \pause
-
-  \begin{block}{Propose a smarter strategy to choose the "winning" renaming}
-    \begin{itemize}
-      \item How to minimize the overall computations?
-    \end{itemize}
-  \end{block}
-
-\end{frame}
-
 \begin{frame}{LogootSplit identifiers}
   \begin{itemize}
     \item To comply with these constraints, LogootSplit proposes identifiers composed of quadruplets of integers of the following form:
@@ -442,7 +423,6 @@
 \end{frame}
 
 \begin{frame}{Identifier constraints}
-
   \begin{itemize}
     \item To fulfill their role, identifiers have to comply to several constraints:
   \end{itemize}
@@ -465,7 +445,6 @@
 \end{frame}
 
 \begin{frame}{Handling concurrent \emph{rename}}
-
   \begin{center}
     \emph{The topic of a later contribution}
   \end{center}
@@ -484,43 +463,22 @@
       \item Define additional rewriting rules to \emph{undo} the effect of "losing" ones
     \end{itemize}
   \end{block}
-
 \end{frame}
 
-% \begin{frame}{Identifier-based \acp{CRDT}}
-%   \begin{block}{Identifiers}
-%     \begin{itemize}
-%       \item Attached to elements or updates
-%       \item Have to comply to several constraints
-%       \begin{itemize}
-%         \item Unique
-%         \item Immutable
-%         \item Order relation
-%         \item Many others
-%       \end{itemize}
-%       \item Achieve transaction-less and commutative updates
-%     \end{itemize}
-%   \end{block}
-%   \begin{alertblock}{Limits}<2->
-%     \begin{itemize}
-%       \item Unbounded size of identifiers
-%       % TODO: Soit ils grossissent très vite, soit tombstones
-%       \item Efficiency decreasing over time
-%     \end{itemize}
-%   \end{alertblock}
-% \end{frame}
+\begin{frame}{Perspectives}
+  \begin{block}{Propose a strategy to avoid conflicting \emph{rename} operations}
+    \begin{itemize}
+      \item How to minimize likelihood of concurrent \emph{rename} operations without coordinating?
+    \end{itemize}
+  \end{block}
 
-% \begin{frame}{Research problem}
-%   \begin{block}{Reduce size of identifiers}
-%     \begin{itemize}
-%       \item Renaming problem\cite{AlistarhAGG2011}
-%     \end{itemize}
-%   \end{block}
-%   \begin{alertblock}<2->{Make identifiers mutable again}
-%     \begin{itemize}
-%       \item Trade-off mutability/immutability
-%     \end{itemize}
-%   \end{alertblock}
-% \end{frame}
+  \pause
+
+  \begin{block}{Propose a smarter strategy to choose the "winning" renaming}
+    \begin{itemize}
+      \item How to minimize the overall computations?
+    \end{itemize}
+  \end{block}
+\end{frame}
 
 \end{document}
